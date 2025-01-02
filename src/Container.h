@@ -21,7 +21,7 @@ protected:
 
 class Circle : public Container {
 public:
-  Circle(float radius, glm::vec2 center, float aspectRatio);
+  Circle(float radius, glm::vec2 center);
 
   void setupBuffers() override;
   void setupBuffers(int numVertices);
@@ -37,7 +37,6 @@ private:
   std::vector<float> m_vertices{};
   float m_radius{};
   glm::vec2 m_center{};
-  float m_aspectRatio{};
 };
 
 }; // namespace Container
