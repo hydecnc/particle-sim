@@ -1,20 +1,45 @@
 #include "Particle.h"
-#include <glm/vec2.hpp>
+#include "configuration.h"
+#include <glm/geometric.hpp>
 #include <iostream>
 
-Particle::Particle(float radius, glm::vec2 curPosition, glm::vec2 acceleration)
-    : m_radius{radius}, m_curPosition{curPosition},
-      m_acceleration{acceleration} {};
+Particle::Particle(float radius, const glm::vec2 &curPosition,
+                   const glm::vec2 &acceleration, const glm::vec3 &color)
+    : m_radius{radius}, m_curPosition{curPosition}, m_prevPosition{curPosition},
+      m_acceleration{acceleration}, m_color{color} {};
+
+void Particle::accelerate(const glm::vec2 &acceleration) {
+  m_acceleration += acceleration;
+}
 
 void Particle::updatePosition(float dt) {
-  m_prevPosition = m_curPosition;
-  m_curPosition =
+  glm::vec2 newPosition =
       m_curPosition + m_curPosition - m_prevPosition + m_acceleration * dt * dt;
+  m_prevPosition = m_curPosition;
+  m_curPosition = newPosition;
   m_acceleration = {0, 0};
 }
 
-void Particle::accelerate(glm::vec2 acceleration) {
-  m_acceleration += acceleration;
+void Particle::solveCollision(std::vector<Particle> &particles, int index) {
+  for (int i{index}; i < particles.size(); ++i) {
+    Particle &particle{particles[i]};
+    glm::vec2 disp{m_curPosition - particle.curPosition()};
+    disp.x *= constants::aspectRatio;
+
+    const float dist{glm::length(disp)};
+
+    if (dist < m_radius + particle.radius()) {
+      const glm::vec2 n{glm::normalize(disp)};
+      const float delta{(m_radius + particle.radius()) - dist};
+      glm::vec2 factor{0.5f * delta * n};
+      factor.x /= constants::aspectRatio;
+
+      m_curPosition += factor;
+      particle.moidfyCurrentPosition(-1.0f * factor);
+      // m_curPosition += 0.5f * delta * n;
+      // particle.moidfyCurrentPosition(-0.5f * delta * n);
+    }
+  }
 }
 
 void Particle::print() const {
@@ -22,14 +47,19 @@ void Particle::print() const {
             << ")\n";
 }
 
-glm::vec2 Particle::curPosition() const { return m_curPosition; }
-glm::vec2 Particle::prevPosition() const { return m_prevPosition; }
+const glm::vec2 &Particle::curPosition() const { return m_curPosition; }
+const glm::vec2 &Particle::prevPosition() const { return m_prevPosition; }
 float Particle::radius() const { return m_radius; }
+const glm::vec2 &Particle::acceleration() const { return m_acceleration; }
 
-void Particle::setCurrentPosition(glm::vec2 position) {
+void Particle::setCurrentPosition(const glm::vec2 &position) {
   m_curPosition = position;
 }
 
-void Particle::setPreviousPosition(glm::vec2 position) {
+void Particle::moidfyCurrentPosition(const glm::vec2 &factor) {
+  m_curPosition += factor;
+}
+
+void Particle::setPreviousPosition(const glm::vec2 &position) {
   m_prevPosition = position;
 }

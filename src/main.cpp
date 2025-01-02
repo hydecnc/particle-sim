@@ -11,24 +11,22 @@
 #include "Particle.h"
 #include "Container.h"
 #include "ParticleGroup.h"
+#include "configuration.h"
 // clang-format on
 
 // function declaration
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window, ParticleGroup &particleGroup);
 
-// settings / contants
-const unsigned int SCR_WIDTH{800};
-const unsigned int SCR_HEIGHT{800};
-const float PARTICLE_RADIUS{0.03f}; // radius of particle, from 0 to 1
-const float CONTAINER_RADIUS{0.9f}; // radius of container, from 0 to 1
-const glm::vec2 GRAVITY{0.0f, -30.0f};
+// boolean to prevent repeated kepresses for every frame
+bool spacePressed{false};
 
-// particles
-std::vector<Particle> particles{
-    // {{0.5f, 0.0f}, GRAVITY},
-    {PARTICLE_RADIUS, {-0.5f, 0.0f}, GRAVITY},
-    // {{0.0f, 0.5f}, GRAVITY},
+// initial particles
+std::vector<Particle> initialParicles{
+    {constants::particleRadius,
+     {0.5f, 0.5f},
+     constants::gravity,
+     {1.0f, 1.0f, 0.0f}},
 };
 
 // timing
@@ -43,8 +41,9 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // window setup
-  GLFWwindow *window{glfwCreateWindow(
-      SCR_WIDTH, SCR_HEIGHT, "Particle Simulation GL", nullptr, nullptr)};
+  GLFWwindow *window{glfwCreateWindow(constants::scrWidth, constants::scrHeight,
+                                      "Particle Simulation GL", nullptr,
+                                      nullptr)};
   if (!window) {
     std::cout << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
@@ -77,17 +76,14 @@ int main() {
   };
 
   // setup container & particle group
-  Container::Circle container{CONTAINER_RADIUS,
-                              {0.0f, 0.0f},
-                              static_cast<float>(SCR_WIDTH) /
-                                  static_cast<float>(SCR_HEIGHT)};
-  ParticleGroup particleGroup{container, particles};
+  Container::Circle container{constants::containerRadius, {0.0f, 0.0f}};
+  ParticleGroup particleGroup{container, initialParicles};
   particleGroup.setupBuffers();
   container.setupBuffers();
 
   // activate shaders & set uniforms
   particleShader.use();
-  particleShader.setFloat("radius", PARTICLE_RADIUS * SCR_HEIGHT * 2.0f);
+  particleShader.setFloat("toPixel", constants::scrHeight * 2.0f);
 
   // display window & wait until it is visible on the screen
   glfwShowWindow(window);
@@ -136,11 +132,21 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 void processInput(GLFWwindow *window, ParticleGroup &particleGroup) {
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+    spacePressed = false;
+  }
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-    particleGroup.addParticle(
-        {PARTICLE_RADIUS,
-         {Random::get(-1.0f, 1.0f), Random::get(-1.0f, 1.0f)},
-         GRAVITY});
+    if (!spacePressed) {
+      spacePressed = true;
+      particleGroup.addParticle({Random::get(0.02f, 0.04f),
+                                 {0.0, 0.6},
+                                 constants::gravity,
+                                 {
+                                     Random::get(0.0f, 1.0f),
+                                     Random::get(0.0f, 1.0f),
+                                     Random::get(0.0f, 1.0f),
+                                 }});
+    }
   }
   if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
     particleGroup.removeParticle();
