@@ -33,6 +33,7 @@ set(SOURCE_FILES
   src/main.cpp
   src/Particle.cpp
   src/Container.cpp
+  src/Grid.cpp
   src/ParticleGroup.cpp
   src/glad.c
 )

@@ -5,20 +5,27 @@
 #include "ParticleGroup.h"
 #include "Particle.h"
 #include "configuration.h"
+#include <iostream>
 
-ParticleGroup::ParticleGroup(Container::Container &container,
-                             const std::vector<Particle> particles)
+ParticleGroup::ParticleGroup(const Container::Container &container,
+                             const std::vector<Particle> &particles)
     : m_container{container}, m_particles{particles} {
+  m_particles.reserve(1000);
   glGenVertexArrays(1, &m_VAO);
-  glGenBuffers(1, &m_VBO);
+  glGenBuffers(m_bufferCount, m_VBOs);
 }
 
 void ParticleGroup::setupBuffers() {
-  glBindVertexArray(m_VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-  glBufferData(GL_ARRAY_BUFFER, m_particles.size() * sizeof(Particle),
-               m_particles.data(), GL_DYNAMIC_DRAW);
 
+  // setup two VBOs
+  for (int i{0}; i < m_bufferCount; ++i) {
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBOs[i]);
+    glBufferData(GL_ARRAY_BUFFER, m_particles.capacity() * sizeof(Particle),
+                 nullptr, GL_DYNAMIC_DRAW);
+  }
+
+  glBindVertexArray(m_VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, m_VBOs[0]);
   // pass in position
   glVertexAttribPointer(
       0, 2, GL_FLOAT, GL_FALSE, sizeof(Particle),
@@ -36,18 +43,21 @@ void ParticleGroup::setupBuffers() {
   glEnableVertexAttribArray(2);
 }
 
-void ParticleGroup::render() const {
-  glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-  glBufferData(GL_ARRAY_BUFFER, m_particles.size() * sizeof(Particle),
-               m_particles.data(), GL_DYNAMIC_DRAW);
+void ParticleGroup::render() {
+  // swap buffers
+  m_currentBuffer = (m_currentBuffer + 1) % m_bufferCount;
+
+  glBindBuffer(GL_ARRAY_BUFFER, m_VBOs[m_currentBuffer]);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, m_particles.size() * sizeof(Particle),
+                  m_particles.data());
 
   glBindVertexArray(m_VAO);
   glDrawArrays(GL_POINTS, 0, m_particles.size());
 }
 
-void ParticleGroup::cleanUp() {
+void ParticleGroup::cleanUp() const {
   glDeleteVertexArrays(1, &m_VAO);
-  glDeleteBuffers(1, &m_VBO);
+  glDeleteBuffers(m_bufferCount, m_VBOs);
 }
 
 void ParticleGroup::updateParticles(float deltaTime) {
@@ -56,18 +66,22 @@ void ParticleGroup::updateParticles(float deltaTime) {
 
   // use substeps for better verlet simulation results
   for (int subStep{subSteps}; subStep > 0; --subStep) {
-    int i{1}; // index to prevent redundant collision calculation
     for (Particle &particle : m_particles) {
       particle.accelerate(constants::gravity);
       m_container.applyConstraint(particle);
-      particle.solveCollision(m_particles, i);
+    }
+    m_grid.updateGrid(m_particles);
+    m_grid.solveCollisions();
+    for (Particle &particle : m_particles) {
       particle.updatePosition(subDeltaTime);
-      ++i;
     }
   }
 }
 
 void ParticleGroup::addParticle(const Particle &particle) {
+  if (m_particles.size() >= m_particles.capacity()) {
+    std::cerr << "Warning: Adding particle beyond buffer capacity\n";
+  }
   m_particles.push_back(particle);
 }
 
@@ -77,3 +91,12 @@ void ParticleGroup::removeParticle() {
   }
   m_particles.pop_back();
 }
+
+void ParticleGroup::printParticles() const {
+  for (const Particle &particle : m_particles) {
+    std::cout << '(' << particle.curPosition().x << ", "
+              << particle.curPosition().y << "), ";
+  }
+}
+
+int ParticleGroup::particleCount() const { return m_particles.size(); }

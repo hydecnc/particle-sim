@@ -44,13 +44,13 @@ void Container::Circle::cleanUp() {
   glDeleteBuffers(1, &m_VBO);
 }
 
-void Container::Circle::applyConstraint(Particle &particle) {
+void Container::Circle::applyConstraint(Particle &particle) const {
   glm::vec2 disp{particle.curPosition() - m_center};
   disp.x *= constants::aspectRatio;
   const float dist{glm::length(disp)};
 
   if (dist > (m_radius - particle.radius())) {
-    const glm::vec2 n{glm::normalize(disp)};
+    const glm::vec2 n{disp / dist};
     glm::vec2 newPos{m_center + n * (m_radius - particle.radius())};
     newPos.x /= constants::aspectRatio;
     particle.setCurrentPosition(newPos);

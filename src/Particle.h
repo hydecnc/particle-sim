@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#include <vector>
 
 class Particle {
 public:
@@ -12,7 +11,7 @@ public:
 
   void updatePosition(float dt);
   void accelerate(const glm::vec2 &acc);
-  void solveCollision(std::vector<Particle> &particles, int index);
+  void solveCollision(Particle &particle);
   void print() const;
 
   const glm::vec2 &curPosition() const;

@@ -12,7 +12,7 @@ public:
   virtual void setupBuffers() = 0;
   virtual void render() const = 0;
   virtual void cleanUp() = 0;
-  virtual void applyConstraint(Particle &particle) = 0;
+  virtual void applyConstraint(Particle &particle) const = 0;
 
 protected:
   unsigned int m_VAO{};
@@ -27,7 +27,7 @@ public:
   void setupBuffers(int numVertices);
   void render() const override;
   void cleanUp() override;
-  void applyConstraint(Particle &particle) override;
+  void applyConstraint(Particle &particle) const override;
 
   float radius() const;
   float aspectRatio() const;
