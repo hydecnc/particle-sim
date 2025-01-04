@@ -21,9 +21,26 @@ void processInput(GLFWwindow *window, ParticleGroup &particleGroup);
 // boolean to prevent repeated kepresses for every frame
 bool spacePressed{false};
 int framecount{0};
+// int particleIndex{0};
+// unsigned int seed{std::random_device{}()};
+// unsigned int seed{2981980641};
+// std::mt19937 mt{seed};
+// std::uniform_real_distribution r{0.015f, 0.03f};
+// float getSeededRandom() {
+//   // std::cout << r(mt) << '\n';
+//   return r(mt);
+// }
+
+// colors of particles
+// const std::vector<glm::vec3> colors = {};
 
 // initial particles
-const std::vector<Particle> initialParicles{};
+std::vector<Particle> initialParicles{
+    // {constants::particleRadius,
+    //  {0.5f, 0.5f},
+    //  constants::gravity,
+    //  {1.0f, 1.0f, 0.0f}},
+};
 
 // timing
 float deltaTime{0.0f};
@@ -88,6 +105,9 @@ int main() {
     glfwWaitEvents();
   }
 
+  // random number based on seed
+  // std::cout << "Current seed: " << seed << '\n';
+
   // main loop
   while (!glfwWindowShouldClose(window)) {
     // per-frame time logic
@@ -99,14 +119,28 @@ int main() {
     processInput(window, particleGroup);
 
     // add particles
-    // if (framecount >= 10) {
-    //   particleGroup.addParticle({constants::particleRadius,
-    //                              {0.0, 0.8},
-    //                              constants::acceleration,
-    //                              {1.0f, 0.2f, 0.2f}});
-    //   framecount = 0;
-    // }
-    // ++framecount;
+    if (framecount >= 10) {
+      particleGroup.addParticle({constants::particleRadius,
+                                 {0.0, 0.8},
+                                 constants::acceleration,
+                                 {0.0f, 0.2f, 0.2f}});
+      // if (particleIndex < colors.size()) {
+      //   particleGroup.addParticle({getSeededRandom(),
+      //                              {0.0, 0.8},
+      //                              constants::acceleration,
+      //                              colors[particleIndex]});
+      //   framecount = 0;
+      //   ++particleIndex;
+      // } else {
+      //   particleGroup.addParticle({getSeededRandom(),
+      //                              {0.0, 0.8},
+      //                              constants::acceleration,
+      //                              {0.0f, 0.0f, 0.0f}});
+      // framecount = 0;
+      // }
+      framecount = 0;
+    }
+    ++framecount;
     std::cout << "FPS: " << 1.0f / deltaTime << '\n';
 
     // render
@@ -114,8 +148,8 @@ int main() {
                  constants::backgroundColor.b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // draw container
     containerShader.use();
+    // draw container
     container.render();
 
     // activate particleShader & update particles
@@ -127,9 +161,9 @@ int main() {
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
-  std::cout << "Particle Count: " << particleGroup.particleCount() << '\n';
 
   // cleaup
+  // particleGroup.printParticles();
   container.cleanUp();
   particleGroup.cleanUp();
 
