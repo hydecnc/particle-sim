@@ -34,29 +34,8 @@ void Particle::solveCollision(Particle &particle) {
 
     m_curPosition += factor;
     particle.moidfyCurrentPosition(-1.0f * factor);
-    std::cout << "Collision!" << '\n';
   }
 }
-
-// void Particle::solveCollision(std::vector<Particle> &particles, int index) {
-//   for (int i{index}; i < particles.size(); ++i) {
-//     Particle &particle{particles[i]};
-//     glm::vec2 disp{m_curPosition - particle.curPosition()};
-//     disp.x *= constants::aspectRatio;
-//
-//     const float dist{glm::length(disp)};
-//
-//     if (dist < m_radius + particle.radius()) {
-//       const glm::vec2 n{disp / dist};
-//       const float delta{(m_radius + particle.radius()) - dist};
-//       glm::vec2 factor{0.5f * delta * n};
-//       factor.x /= constants::aspectRatio;
-//
-//       m_curPosition += factor;
-//       particle.moidfyCurrentPosition(-1.0f * factor);
-//     }
-//   }
-// }
 
 void Particle::print() const {
   std::cout << "Particle: (" << m_curPosition.x << ", " << m_curPosition.y

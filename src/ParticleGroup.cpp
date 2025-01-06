@@ -10,7 +10,7 @@
 ParticleGroup::ParticleGroup(const Container::Container &container,
                              const std::vector<Particle> &particles)
     : m_container{container}, m_particles{particles} {
-  m_particles.reserve(1000);
+  m_particles.reserve(constants::maxParticles);
   glGenVertexArrays(1, &m_VAO);
   glGenBuffers(m_bufferCount, m_VBOs);
 }

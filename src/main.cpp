@@ -99,14 +99,17 @@ int main() {
     processInput(window, particleGroup);
 
     // add particles
-    // if (framecount >= 10) {
-    //   particleGroup.addParticle({constants::particleRadius,
-    //                              {0.0, 0.8},
-    //                              constants::acceleration,
-    //                              {1.0f, 0.2f, 0.2f}});
-    //   framecount = 0;
-    // }
-    // ++framecount;
+    if (framecount >= 10) {
+      particleGroup.addParticle({Random::get(constants::particleRadius / 2,
+                                             constants::particleRadius),
+                                 {0.0, 0.8},
+                                 constants::acceleration,
+                                 {0.6f, 0.6f, 0.3f}});
+      framecount = 0;
+    }
+    ++framecount;
+
+    // FPS counter
     std::cout << "FPS: " << 1.0f / deltaTime << '\n';
 
     // render
@@ -148,8 +151,9 @@ void processInput(GLFWwindow *window, ParticleGroup &particleGroup) {
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
     if (!spacePressed) {
       spacePressed = true;
-      particleGroup.addParticle({Random::get(0.02f, 0.04f),
-                                 {0.0, 0.6},
+      particleGroup.addParticle({Random::get(constants::particleRadius / 2,
+                                             constants::particleRadius),
+                                 {0.4, 0.6},
                                  constants::gravity,
                                  {
                                      Random::get(0.0f, 1.0f),
