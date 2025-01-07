@@ -27,6 +27,6 @@ public:
   void checkCellCollisions(Cell &c1, Cell &c2) const;
 
 private:
-  std::array<std::array<Cell, constants::gridSize>, constants::gridSize>
+  std::array<std::array<Cell, constants::numCells>, constants::numCells>
       m_cells{};
 };

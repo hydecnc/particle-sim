@@ -14,7 +14,7 @@ public:
   void render();
   void cleanUp() const;
 
-  void updateParticles(float deltaTime);
+  void updateParticles(const float deltaTime);
 
   void addParticle(const Particle &particle);
   void removeParticle();
