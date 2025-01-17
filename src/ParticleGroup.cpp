@@ -16,12 +16,11 @@ ParticleGroup::ParticleGroup(const Container::Container &container,
 }
 
 void ParticleGroup::setupBuffers() {
-
   // setup two VBOs
   for (int i{0}; i < m_bufferCount; ++i) {
     glBindBuffer(GL_ARRAY_BUFFER, m_VBOs[i]);
     glBufferData(GL_ARRAY_BUFFER, m_particles.capacity() * sizeof(Particle),
-                 nullptr, GL_DYNAMIC_DRAW);
+                 nullptr, GL_STREAM_DRAW);
   }
 
   glBindVertexArray(m_VAO);
@@ -60,8 +59,8 @@ void ParticleGroup::cleanUp() const {
   glDeleteBuffers(m_bufferCount, m_VBOs);
 }
 
-void ParticleGroup::updateParticles(float deltaTime) {
-  const int subSteps{8};
+void ParticleGroup::updateParticles(const float deltaTime) {
+  constexpr int subSteps{8};
   const float subDeltaTime{deltaTime / static_cast<float>(subSteps)};
 
   // use substeps for better verlet simulation results

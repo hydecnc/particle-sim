@@ -1,7 +1,5 @@
 #include "Grid.h"
 #include "configuration.h"
-#include <cmath>
-#include <cstdlib>
 #include <iostream>
 
 void Cell::addParticle(Particle &particle) {
@@ -18,8 +16,8 @@ void Cell::addParticle(Particle &particle) {
 void Cell::clear() { m_particleCount = 0; }
 
 Grid::Grid() {
-  for (int x{0}; x < constants::gridSize; ++x) {
-    for (int y{0}; y < constants::gridSize; ++y) {
+  for (int x{0}; x < constants::numCells; ++x) {
+    for (int y{0}; y < constants::numCells; ++y) {
       m_cells[x][y] = Cell();
     }
   }
@@ -36,8 +34,9 @@ void Grid::clearGrid() {
 void Grid::fillGrid(std::vector<Particle> &particles) {
   for (Particle &particle : particles) {
     const glm::vec2 gridPos{(particle.curPosition() + 1.0f) / 2.0f *
-                            static_cast<float>(constants::gridSize - 1)};
-    m_cells[std::floor(gridPos.x)][std::floor(gridPos.y)].addParticle(particle);
+                            static_cast<float>(constants::numCells - 1)};
+    m_cells[static_cast<int>(gridPos.x)][static_cast<int>(gridPos.y)]
+        .addParticle(particle);
   }
 }
 
@@ -47,8 +46,8 @@ void Grid::updateGrid(std::vector<Particle> &particles) {
 }
 
 void Grid::solveCollisions() {
-  for (int x{1}; x < constants::gridSize - 1; ++x) {
-    for (int y{1}; y < constants::gridSize - 1; ++y) {
+  for (int x{1}; x < constants::numCells - 1; ++x) {
+    for (int y{1}; y < constants::numCells - 1; ++y) {
       Cell &currentCell{m_cells[x][y]};
       // iterate on all surrouding cells, including itself
       for (int dx{-1}; dx <= 1; ++dx) {
