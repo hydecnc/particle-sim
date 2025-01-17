@@ -104,8 +104,7 @@ int main() {
 
     // add particles
     if (framecount >= 10) {
-      particleGroup.addParticle({Random::get(constants::particleRadius / 2,
-                                             constants::particleRadius),
+      particleGroup.addParticle({constants::particleRadius,
                                  {0.0, 0.8},
                                  constants::acceleration,
                                  {0.6f, 0.9f, 0.3f}});
@@ -114,7 +113,7 @@ int main() {
     ++framecount;
 
     // FPS counter
-    std::cout << "FPS: " << 1.0f / deltaTime << '\n';
+    // std::cout << "FPS: " << 1.0f / deltaTime << '\n';
 
     // render
     glClearColor(constants::backgroundColor.r, constants::backgroundColor.g,
@@ -167,6 +166,6 @@ void processInput(GLFWwindow *window, ParticleGroup &particleGroup) {
     }
   }
   if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
-    particleGroup.removeParticle();
+    // particleGroup.removeParticle();
   }
 }
