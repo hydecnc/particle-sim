@@ -1,9 +1,9 @@
-// FRAGMENT SHADER
-#version 330 core
+#version 320 es
 
-in vec3 color;
+precision mediump float;
+
+in vec4 color;
 out vec4 FragColor;
-
 
 void main() {
     // Convert point coord to center origin (-1 to +1)
@@ -12,6 +12,5 @@ void main() {
 
     float alpha = smoothstep(1.0, 0.9, r);
 
-    // FragColor = vec4(1.0, 1.0, 1.0, alpha);
-    FragColor = vec4(color.x, color.y, color.z, alpha);
+    FragColor = vec4(color.r, color.g, color.b, alpha * color.a);
 }
