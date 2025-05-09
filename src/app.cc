@@ -1,7 +1,6 @@
 #define SDL_MAIN_USE_CALLBACKS
-#include "Shader.h"
+#include "Container.h"
 #include "configuration.h"
-#include "opengl_utils.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <iostream>
@@ -11,10 +10,20 @@
 unsigned int last_time{0};
 unsigned int current_time{0};
 
+struct AppState {
+  // SDL states
+  SDL_Window *window{};
+  // OpenGL states
+  SDL_GLContext gl_context{};
+  // Particle states
+  std::vector<Particle> particles{};
+  // Container
+  CircleContainer container;
+};
+
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   // Create AppState and assign it to appstate
-  *appstate = new AppState{};
-  AppState &state = *static_cast<AppState *>(*appstate);
+  // AppState &state = *static_cast<AppState *>(*appstate);
 
   // Initialize SDL3
   if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -23,8 +32,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   }
 
   // Setup window
-  state.window = SDL_CreateWindow("Constellation", 800, 800, SDL_WINDOW_OPENGL);
-  if (!state.window) {
+  SDL_Window *window =
+      SDL_CreateWindow("Constellation", 800, 800, SDL_WINDOW_OPENGL);
+  if (!window) {
     SDL_Log("Couldn't create window: %s", SDL_GetError());
     return SDL_APP_FAILURE;
   }
@@ -36,8 +46,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
   // Create OpenGL context
-  state.gl_context = SDL_GL_CreateContext(state.window);
-  if (!state.gl_context) {
+  SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+  if (!gl_context) {
     SDL_Log("Couldn't create OpenGL context: %s", SDL_GetError());
     return SDL_APP_FAILURE;
   }
@@ -47,23 +57,29 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     SDL_Log("Failed to initialize GLAD");
     return SDL_APP_FAILURE;
   }
-  SDL_GL_MakeCurrent(state.window, state.gl_context);
+  SDL_GL_MakeCurrent(window, gl_context);
 
-  state.particles = {
-      Particle{10.0, {1.0, 0.0, 0.0, 1.0}},
+  std::vector<Particle> particles = {
+      Particle{conf::kParticleRadius, {1.0, 0.0, 0.0, 1.0}},
       // Particle{20.0, {0.0, 1.0, 0.0, 1.0}},
   };
 
   // Initialize OpenGL and creaete shaders
-  initializeOpenGL(state);
-
   const std::string shader_path{
       "/home/voidy/devel/projects/cpp/particle_sim/src/shaders/"};
-  state.shader = Shader((shader_path + "particle.vert").c_str(),
-                        (shader_path + "particle.frag").c_str());
+  Shader container_shader =
+      Shader((shader_path + "circle_container.vert").c_str(),
+             (shader_path + "circle_container.frag").c_str());
+  Shader particle_shader = Shader((shader_path + "particle.vert").c_str(),
+                                  (shader_path + "particle.frag").c_str());
+  CircleContainer container =
+      CircleContainer{particles, container_shader, particle_shader};
+  container.setupContainerBuffers();
+  container.setupParticleBuffers();
+
+  *appstate = new AppState{window, gl_context, particles, container};
 
   SDL_Log("Application started successfully!");
-
   return SDL_APP_CONTINUE;
 }
 
@@ -86,25 +102,11 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   float deltatime{static_cast<float>(current_time - last_time) / 1000};
 
   // Clear previous frame
-  glClearColor(conf::backgroundColor.r, conf::backgroundColor.g,
-               conf::backgroundColor.b, conf::backgroundColor.a);
+  glClearColor(conf::kBackgroundColo.r, conf::kBackgroundColo.g,
+               conf::kBackgroundColo.b, conf::kBackgroundColo.a);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  // Activate shader
-  state.shader.use();
-  // state.shader.setFloat("radius", kStarSize);
-
-  glBindBuffer(GL_ARRAY_BUFFER, state.VBO);
-  for (auto &particle : state.particles) {
-    particle.updatePosition(deltatime);
-    std::cout << "Updated position: " << particle.m_curPosition.x << ", "
-              << particle.m_curPosition.y << '\n';
-  }
-  glBufferSubData(GL_ARRAY_BUFFER, 0, state.particles.size() * sizeof(Particle),
-                  state.particles.data());
-
-  glBindVertexArray(state.VAO);
-  glDrawArrays(GL_POINTS, 0, state.particles.size());
+  state.container.drawContainer();
 
   SDL_GL_SwapWindow(state.window);
 
@@ -115,7 +117,5 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result) {
   AppState &state = *static_cast<AppState *>(appstate);
   // SDL3 cleans up the window/render for us.
   SDL_GL_DestroyContext(state.gl_context);
-  glDeleteVertexArrays(1, &state.VAO);
-  glDeleteBuffers(1, &state.VBO);
-  glDeleteProgram(state.shader.programId);
+  state.container.cleanUp();
 }

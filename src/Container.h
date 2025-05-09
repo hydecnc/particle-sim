@@ -1,42 +1,35 @@
 #pragma once
 
 #include "Particle.h"
-#include <glm/vec2.hpp>
+#include "Shader.h"
 #include <vector>
 
-namespace Container {
-class Container {
+class CircleContainer {
 public:
-  virtual ~Container() = default;
-  //
-  virtual void setupBuffers() = 0;
-  virtual void render() const = 0;
-  virtual void cleanUp() = 0;
-  virtual void applyConstraint(Particle &particle) const = 0;
+  GLuint m_containerVAO{};
+  GLuint m_containerVBO{};
+  GLuint m_particlesVAO{};
+  GLuint m_particlesVBO{};
 
-protected:
-  unsigned int m_VAO{};
-  unsigned int m_VBO{};
+  Shader m_containerShader{};
+  Shader m_particleShader{};
+
+  std::vector<Particle> m_particles{};
+
+  struct Data {
+    float m_radius{500};
+    glm::vec2 m_position{0, 0};
+    glm::vec4 m_color{79.0f / 255.0f, 195.0f / 255.0f, 247.0f / 255.0f, 1.0f};
+  } m_data{};
+
+  CircleContainer(const std::vector<Particle> &particles,
+                  const Shader &containerShader, const Shader &particleShader);
+
+  void setupParticleBuffers();
+  void setupContainerBuffers();
+
+  void drawContainer();
+  void drawParticles(float deltatime);
+
+  void cleanUp();
 };
-
-class Circle : public Container {
-public:
-  Circle(float radius, glm::vec2 center);
-
-  void setupBuffers() override;
-  void setupBuffers(int numVertices);
-  void render() const override;
-  void cleanUp() override;
-  void applyConstraint(Particle &particle) const override;
-
-  float radius() const;
-  float aspectRatio() const;
-  const glm::vec2 &center() const;
-
-private:
-  std::vector<float> m_vertices{};
-  float m_radius{};
-  glm::vec2 m_center{};
-};
-
-}; // namespace Container

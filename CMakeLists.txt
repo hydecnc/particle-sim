@@ -30,6 +30,7 @@ add_executable(particles
   src/app.cc
   src/Shader.cc
   src/Particle.cc
+  src/Container.cc
   src/glad.c
 )
 
