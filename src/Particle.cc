@@ -1,9 +1,10 @@
 #include "Particle.h"
 
-Particle::Particle(float radius, const glm::vec4 &color)
+Particle::Particle(float radius, const glm::vec4 &color,
+                   const glm::vec2 &position)
     : m_radius{radius}, m_color{color} {
-  m_curPosition = {0, 0};
-  m_prevPosition = {0, 0};
+  m_curPosition = position;
+  m_prevPosition = position;
   m_acceleration = {0, -0.98};
 }
 

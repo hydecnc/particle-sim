@@ -11,20 +11,12 @@ unsigned int last_time{0};
 unsigned int current_time{0};
 
 struct AppState {
-  // SDL states
   SDL_Window *window{};
-  // OpenGL states
   SDL_GLContext gl_context{};
-  // Particle states
-  std::vector<Particle> particles{};
-  // Container
   CircleContainer container;
 };
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
-  // Create AppState and assign it to appstate
-  // AppState &state = *static_cast<AppState *>(*appstate);
-
   // Initialize SDL3
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     SDL_Log("Couldn't intialize SDL: %s", SDL_GetError());
@@ -32,8 +24,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   }
 
   // Setup window
-  SDL_Window *window =
-      SDL_CreateWindow("Constellation", 800, 800, SDL_WINDOW_OPENGL);
+  SDL_Window *window = SDL_CreateWindow("Constellation", conf::kWidth,
+                                        conf::kHeight, SDL_WINDOW_OPENGL);
   if (!window) {
     SDL_Log("Couldn't create window: %s", SDL_GetError());
     return SDL_APP_FAILURE;
@@ -60,8 +52,36 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   SDL_GL_MakeCurrent(window, gl_context);
 
   std::vector<Particle> particles = {
-      Particle{conf::kParticleRadius, {1.0, 0.0, 0.0, 1.0}},
-      // Particle{20.0, {0.0, 1.0, 0.0, 1.0}},
+      Particle{
+          conf::kParticleRadius,
+          {1.0, 0.0, 0.0, 1.0},
+          {0.3, 0.6},
+      },
+      Particle{
+          conf::kParticleRadius,
+          {1.0, 0.0, 0.0, 1.0},
+          {0.4, 0.6},
+      },
+      Particle{
+          conf::kParticleRadius,
+          {1.0, 0.0, 0.0, 1.0},
+          {-0.2, 0.6},
+      },
+      Particle{
+          conf::kParticleRadius,
+          {1.0, 0.0, 0.0, 1.0},
+          {-0.3, 0.6},
+      },
+      Particle{
+          conf::kParticleRadius,
+          {1.0, 0.0, 0.0, 1.0},
+          {0.1, 0.6},
+      },
+      Particle{
+          conf::kParticleRadius,
+          {1.0, 0.0, 0.0, 1.0},
+          {0.2, 0.6},
+      },
   };
 
   // Initialize OpenGL and creaete shaders
@@ -77,7 +97,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   container.setupContainerBuffers();
   container.setupParticleBuffers();
 
-  *appstate = new AppState{window, gl_context, particles, container};
+  *appstate = new AppState{window, gl_context, container};
 
   SDL_Log("Application started successfully!");
   return SDL_APP_CONTINUE;
@@ -101,12 +121,24 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   current_time = SDL_GetTicks();
   float deltatime{static_cast<float>(current_time - last_time) / 1000};
 
+  // print fps
+  // float fps{1.0f / deltatime};
+  // std::cout << "\rFPS: " << static_cast<int>(fps) << "    "
+  //           << "Num particles: " << state.container.m_particles.size()
+  //           << "     " << std::flush;
+
   // Clear previous frame
-  glClearColor(conf::kBackgroundColo.r, conf::kBackgroundColo.g,
-               conf::kBackgroundColo.b, conf::kBackgroundColo.a);
+  glClearColor(conf::kBackgroundColor.r, conf::kBackgroundColor.g,
+               conf::kBackgroundColor.b, conf::kBackgroundColor.a);
   glClear(GL_COLOR_BUFFER_BIT);
 
+  state.container.m_particles.push_back(Particle{
+      conf::kParticleRadius,
+      {1.0, 0.0, 0.0, 1.0},
+      {0.2, 0.6},
+  });
   state.container.drawContainer();
+  state.container.drawParticles(deltatime);
 
   SDL_GL_SwapWindow(state.window);
 

@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 // clang-format on
 #include "Shader.h"
+#include "configuration.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengles2.h>
 
@@ -53,7 +54,7 @@ void CircleContainer::setupParticleBuffers() {
   glBindVertexArray(m_particlesVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, m_particlesVBO);
-  glBufferData(GL_ARRAY_BUFFER, m_particles.size() * sizeof(Particle),
+  glBufferData(GL_ARRAY_BUFFER, conf::maxParticles * sizeof(Particle),
                m_particles.data(), GL_STREAM_DRAW);
 
   // Pass the radius of each particle as index 0
@@ -92,14 +93,40 @@ void CircleContainer::drawParticles(float deltatime) {
   glBindBuffer(GL_ARRAY_BUFFER, m_particlesVBO);
   for (auto &particle : m_particles) {
     particle.updatePosition(deltatime);
-    // std::cout << "Updated position: " << particle.m_curPosition.x << ", "
-    //           << particle.m_curPosition.y << '\n';
+    applyConstraint(particle);
   }
   glBufferSubData(GL_ARRAY_BUFFER, 0, m_particles.size() * sizeof(Particle),
                   m_particles.data());
 
   glBindVertexArray(m_particlesVAO);
   glDrawArrays(GL_POINTS, 0, m_particles.size());
+}
+
+void CircleContainer::applyConstraint(Particle &particle) {
+  float particleRadius = particle.m_radius / conf::kHeight;
+  float containerRadius = m_data.m_radius / conf::kHeight;
+
+  glm::vec2 disp{particle.m_curPosition - m_data.m_position};
+  disp.x *= conf::aspectRatio;
+  const float dist{glm::length(disp)};
+
+  if (dist > (containerRadius - particleRadius)) {
+    const glm::vec2 n{disp / dist};
+    glm::vec2 newPos{m_data.m_position +
+                     n * (containerRadius - particleRadius)};
+    newPos.x /= conf::aspectRatio;
+    particle.m_curPosition = newPos;
+  }
+}
+
+void CircleContainer::checkCollisions() {
+  for (Particle &p1 : m_particles) {
+    for (Particle &p2 : m_particles) {
+      if (&p1 == &p2)
+        continue;
+      // TODO: Solve collisions
+    }
+  }
 }
 
 void CircleContainer::cleanUp() {

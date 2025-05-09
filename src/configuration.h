@@ -4,8 +4,8 @@
 
 namespace conf {
 inline constexpr unsigned int kWidth{800};
-inline constexpr unsigned int kHeight{800};
-inline constexpr glm::vec4 kBackgroundColo{0.1f, 0.1f, 0.1f, 1.0f};
+inline constexpr unsigned int kHeight{600};
+inline constexpr glm::vec4 kBackgroundColor{0.1f, 0.1f, 0.1f, 1.0f};
 inline constexpr float aspectRatio{static_cast<float>(kWidth) /
                                    static_cast<float>(kHeight)};
 inline constexpr float kParticleRadius{10.0f};

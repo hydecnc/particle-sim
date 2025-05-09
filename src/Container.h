@@ -17,7 +17,7 @@ public:
   std::vector<Particle> m_particles{};
 
   struct Data {
-    float m_radius{500};
+    float m_radius{600};
     glm::vec2 m_position{0, 0};
     glm::vec4 m_color{79.0f / 255.0f, 195.0f / 255.0f, 247.0f / 255.0f, 1.0f};
   } m_data{};
@@ -30,6 +30,8 @@ public:
 
   void drawContainer();
   void drawParticles(float deltatime);
+  void applyConstraint(Particle &particle);
+  void checkCollisions();
 
   void cleanUp();
 };
