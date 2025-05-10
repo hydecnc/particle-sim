@@ -28,8 +28,9 @@ public:
   void setupParticleBuffers();
   void setupContainerBuffers();
 
+  void updateParticles(float deltatime);
   void drawContainer();
-  void drawParticles(float deltatime);
+  void drawParticles();
   void applyConstraint(Particle &particle);
   void checkCollisions();
 

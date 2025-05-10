@@ -9,6 +9,7 @@
 
 unsigned int last_time{0};
 unsigned int current_time{0};
+unsigned int addpart{0};
 
 struct AppState {
   SDL_Window *window{};
@@ -58,9 +59,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
           {0.3, 0.6},
       },
       Particle{
-          conf::kParticleRadius,
+          conf::kParticleRadius / 2,
           {1.0, 0.0, 0.0, 1.0},
-          {0.4, 0.6},
+          {-0.4, 0.6},
       },
       Particle{
           conf::kParticleRadius,
@@ -119,26 +120,31 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   // Calculate deltatime
   last_time = current_time;
   current_time = SDL_GetTicks();
-  float deltatime{static_cast<float>(current_time - last_time) / 1000};
+  const float deltatime{static_cast<float>(current_time - last_time) / 1000};
 
   // print fps
-  // float fps{1.0f / deltatime};
-  // std::cout << "\rFPS: " << static_cast<int>(fps) << "    "
-  //           << "Num particles: " << state.container.m_particles.size()
-  //           << "     " << std::flush;
+  float fps{1.0f / deltatime};
+  std::cout << "\rFPS: " << static_cast<int>(fps) << "    "
+            << "Num particles: " << state.container.m_particles.size()
+            << "     " << std::flush;
 
   // Clear previous frame
   glClearColor(conf::kBackgroundColor.r, conf::kBackgroundColor.g,
                conf::kBackgroundColor.b, conf::kBackgroundColor.a);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  state.container.m_particles.push_back(Particle{
-      conf::kParticleRadius,
-      {1.0, 0.0, 0.0, 1.0},
-      {0.2, 0.6},
-  });
+  addpart += 1;
+  if (addpart >= 50) {
+    state.container.m_particles.push_back(Particle{
+        conf::kParticleRadius,
+        {1.0, 0.0, 0.0, 1.0},
+        {0.2, 0.6},
+    });
+    addpart = 0;
+  }
   state.container.drawContainer();
-  state.container.drawParticles(deltatime);
+  state.container.updateParticles(deltatime);
+  state.container.drawParticles();
 
   SDL_GL_SwapWindow(state.window);
 
