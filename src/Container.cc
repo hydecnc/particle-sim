@@ -6,7 +6,6 @@
 #include "configuration.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengles2.h>
-#include <iostream>
 
 CircleContainer::CircleContainer(const std::vector<Particle> &particles,
                                  const Shader &containerShader,
@@ -87,8 +86,8 @@ void CircleContainer::drawContainer() {
   glDrawArrays(GL_POINTS, 0, 1);
 }
 
-void CircleContainer::updateParticles(float deltatime) {
-  const int substeps{1};
+void CircleContainer::updateParticles(const float deltatime) {
+  constexpr int substeps{1};
   const float sub_deltatime{deltatime / static_cast<float>(substeps)};
 
   for (std::size_t i{0}; i < substeps; ++i) {

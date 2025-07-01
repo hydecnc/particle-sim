@@ -87,7 +87,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
 
   // Initialize OpenGL and creaete shaders
   const std::string shader_path{
-      "/home/voidy/devel/projects/cpp/particle_sim/src/shaders/"};
+      "/home/arete/devel/projects/cpp/particle_sim/src/shaders/"};
   Shader container_shader =
       Shader((shader_path + "circle_container.vert").c_str(),
              (shader_path + "circle_container.frag").c_str());

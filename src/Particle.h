@@ -4,7 +4,7 @@
 
 class Particle {
 public:
-  float m_radius{};
+  const float m_radius{};
   glm::vec4 m_color{};
   glm::vec2 m_curPosition{};
   glm::vec2 m_prevPosition{};

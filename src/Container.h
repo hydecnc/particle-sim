@@ -28,7 +28,7 @@ public:
   void setupParticleBuffers();
   void setupContainerBuffers();
 
-  void updateParticles(float deltatime);
+  void updateParticles(const float deltatime);
   void drawContainer();
   void drawParticles();
   void applyConstraint(Particle &particle);
