@@ -1,6 +1,6 @@
 # Particle Simulator
 
-Particle Simulator built from scratch.
+Particle Simulator built with [SDL3](https://wiki.libsdl.org/SDL3/FrontPage) and OpenGL ES 3.2.
 
 ## Movement
 
