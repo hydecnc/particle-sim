@@ -33,7 +33,7 @@ public:
   void drawContainer();
   void drawParticles();
   void applyConstraint(Particle &particle);
-  void checkCollisions();
+  void processCollisions();
 
   void cleanUp();
 };

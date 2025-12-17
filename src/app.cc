@@ -1,5 +1,5 @@
 #define SDL_MAIN_USE_CALLBACKS
-#include "Container.h"
+#include "CircleContainer.h"
 #include "configuration.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -9,7 +9,7 @@
 
 unsigned int last_time{0};
 unsigned int current_time{0};
-unsigned int addpart{0};
+unsigned int particle_add_counter{0};
 
 struct AppState {
   SDL_Window *window{};
@@ -53,36 +53,36 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   SDL_GL_MakeCurrent(window, gl_context);
 
   std::vector<Particle> particles = {
-      Particle{
-          conf::kParticleRadius,
-          {1.0, 0.0, 0.0, 1.0},
-          {0.3, 0.6},
-      },
-      Particle{
-          conf::kParticleRadius / 2,
-          {1.0, 0.0, 0.0, 1.0},
-          {-0.4, 0.6},
-      },
-      Particle{
-          conf::kParticleRadius,
-          {1.0, 0.0, 0.0, 1.0},
-          {-0.2, 0.6},
-      },
-      Particle{
-          conf::kParticleRadius,
-          {1.0, 0.0, 0.0, 1.0},
-          {-0.3, 0.6},
-      },
-      Particle{
-          conf::kParticleRadius,
-          {1.0, 0.0, 0.0, 1.0},
-          {0.1, 0.6},
-      },
-      Particle{
-          conf::kParticleRadius,
-          {1.0, 0.0, 0.0, 1.0},
-          {0.2, 0.6},
-      },
+      // Particle{
+      //     conf::kParticleRadius,
+      //     {1.0, 0.0, 0.0, 1.0},
+      //     {0.3, 0.6},
+      // },
+      // Particle{
+      //     conf::kParticleRadius / 2,
+      //     {1.0, 0.0, 0.0, 1.0},
+      //     {-0.4, 0.6},
+      // },
+      // Particle{
+      //     conf::kParticleRadius,
+      //     {1.0, 0.0, 0.0, 1.0},
+      //     {-0.2, 0.6},
+      // },
+      // Particle{
+      //     conf::kParticleRadius,
+      //     {1.0, 0.0, 0.0, 1.0},
+      //     {-0.3, 0.6},
+      // },
+      // Particle{
+      //     conf::kParticleRadius,
+      //     {1.0, 0.0, 0.0, 1.0},
+      //     {0.1, 0.6},
+      // },
+      // Particle{
+      //     conf::kParticleRadius,
+      //     {1.0, 0.0, 0.0, 1.0},
+      //     {0.2, 0.6},
+      // },
   };
 
   // Initialize OpenGL and creaete shaders
@@ -117,8 +117,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 SDL_AppResult SDL_AppIterate(void *appstate) {
   AppState &state = *static_cast<AppState *>(appstate);
 
-  // Calculate deltatime
   last_time = current_time;
+  // Calculate deltatime  last_time = current_time;
   current_time = SDL_GetTicks();
   const float deltatime{static_cast<float>(current_time - last_time) / 1000};
 
@@ -133,14 +133,14 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
                conf::kBackgroundColor.b, conf::kBackgroundColor.a);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  addpart += 1;
-  if (addpart >= 50) {
+  particle_add_counter += 1;
+  if (particle_add_counter >= conf::kParticleSpawnRate) {
     state.container.m_particles.push_back(Particle{
         conf::kParticleRadius,
         {1.0, 0.0, 0.0, 1.0},
         {0.2, 0.6},
     });
-    addpart = 0;
+    particle_add_counter = 0;
   }
   state.container.drawContainer();
   state.container.updateParticles(deltatime);

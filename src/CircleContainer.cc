@@ -1,7 +1,7 @@
 // clang-format off
 #include <glad/glad.h>
 // clang-format on
-#include "Container.h"
+#include "CircleContainer.h"
 #include "Shader.h"
 #include "configuration.h"
 #include <SDL3/SDL.h>
@@ -54,7 +54,7 @@ void CircleContainer::setupParticleBuffers() {
   glBindVertexArray(m_particlesVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, m_particlesVBO);
-  glBufferData(GL_ARRAY_BUFFER, conf::maxParticles * sizeof(Particle),
+  glBufferData(GL_ARRAY_BUFFER, conf::kMaxParticles * sizeof(Particle),
                m_particles.data(), GL_STREAM_DRAW);
 
   // Pass the radius of each particle as index 0
@@ -87,13 +87,21 @@ void CircleContainer::drawContainer() {
 }
 
 void CircleContainer::updateParticles(const float deltatime) {
+  // Make simulation slow down no more than 60 fps
+  constexpr float MAX_DT{1.0f / 60.0f};
+  const float clamped_dt{std::min(deltatime, MAX_DT)};
+
   constexpr int substeps{1};
-  const float sub_deltatime{deltatime / static_cast<float>(substeps)};
+  const float sub_deltatime{clamped_dt / static_cast<float>(substeps)};
 
   for (std::size_t i{0}; i < substeps; ++i) {
     for (auto &particle : m_particles) {
       particle.updatePosition(sub_deltatime);
-      checkCollisions();
+    }
+    for (int iter{0}; iter < 3; ++iter) {
+      processCollisions();
+    }
+    for (auto &particle : m_particles) {
       applyConstraint(particle);
     }
   }
@@ -125,7 +133,7 @@ void CircleContainer::applyConstraint(Particle &particle) {
   }
 }
 
-void CircleContainer::checkCollisions() {
+void CircleContainer::processCollisions() {
   for (std::size_t i{0}; i < m_particles.size(); ++i) {
     Particle &p1{m_particles[i]};
     for (std::size_t j{i + 1}; j < m_particles.size(); ++j) {
