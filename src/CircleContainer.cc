@@ -2,10 +2,12 @@
 #include <glad/glad.h>
 // clang-format on
 #include "CircleContainer.h"
+#include "Grid.h"
 #include "Shader.h"
 #include "configuration.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengles2.h>
+#include <iostream>
 
 CircleContainer::CircleContainer(const std::vector<Particle> &particles,
                                  const Shader &containerShader,
@@ -95,16 +97,20 @@ void CircleContainer::updateParticles(const float deltatime) {
   const float sub_deltatime{clamped_dt / static_cast<float>(substeps)};
 
   for (std::size_t i{0}; i < substeps; ++i) {
+    int part{0};
     for (auto &particle : m_particles) {
+      std::cout << "Particle #: " << part << '\n';
       particle.updatePosition(sub_deltatime);
+      part++;
     }
     for (int iter{0}; iter < 3; ++iter) {
-      processCollisions();
+      m_grid.handleCollision();
     }
     for (auto &particle : m_particles) {
       applyConstraint(particle);
     }
   }
+  // std::cout << "FINISHED\n";
 }
 
 void CircleContainer::drawParticles() {

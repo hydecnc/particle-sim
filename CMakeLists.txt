@@ -31,6 +31,7 @@ add_executable(particles
   src/Shader.cc
   src/Particle.cc
   src/CircleContainer.cc
+  src/Grid.cc
   src/glad.c
 )
 

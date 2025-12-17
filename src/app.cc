@@ -124,18 +124,19 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
   // print fps
   float fps{1.0f / deltatime};
-  std::cout << "\rFPS: " << static_cast<int>(fps) << "    "
-            << "Num particles: " << state.container.m_particles.size()
-            << "     " << std::flush;
+  // std::cout << "\rFPS: " << static_cast<int>(fps) << "    "
+  //           << "Num particles: " << state.container.m_particles.size()
+  //           << "     " << std::flush;
 
   // Clear previous frame
   glClearColor(conf::kBackgroundColor.r, conf::kBackgroundColor.g,
                conf::kBackgroundColor.b, conf::kBackgroundColor.a);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  particle_add_counter += 1;
+  particle_add_counter++;
   if (particle_add_counter >= conf::kParticleSpawnRate) {
     state.container.m_particles.push_back(Particle{
+        &state.container.m_grid,
         conf::kParticleRadius,
         {1.0, 0.0, 0.0, 1.0},
         {0.2, 0.6},

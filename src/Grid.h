@@ -1,31 +1,19 @@
 #pragma once
 #include "Particle.h"
 #include "configuration.h"
-#include <array>
-#include <vector>
-
-class Cell {
-public:
-  static constexpr int maxParticles{conf::maxParticlePerCell};
-  std::array<Particle *, maxParticles> particles{};
-
-  void addParticle(Particle &particle);
-  void clear();
-
-private:
-  int m_particleCount{0};
-};
 
 class Grid {
 public:
   Grid();
-
-  void clearGrid();
-  void fillGrid(std::vector<Particle> &particles);
-  void updateGrid(std::vector<Particle> &particles);
-  void solveCollisions();
-  void checkCellCollisions(Cell &c1, Cell &c2) const;
+  void add(Particle *particle);
+  void handleCollision();
+  void handleParticle(Particle *particle, Particle *other);
+  void handleCell(const int x, const int y);
+  void move(Particle *particle, const glm::vec2 &position);
 
 private:
-  std::array<std::array<Cell, conf::numCells>, conf::numCells> m_cells{};
+  void clearGrid();
+
+private:
+  Particle *m_cells[conf::kNumCells][conf::kNumCells];
 };

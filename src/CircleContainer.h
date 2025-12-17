@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Grid.h"
 #include "Particle.h"
 #include "Shader.h"
 #include "configuration.h"
@@ -16,6 +17,7 @@ public:
   Shader m_particleShader{};
 
   std::vector<Particle> m_particles{};
+  Grid m_grid{};
 
   struct Data {
     float m_radius{600};
