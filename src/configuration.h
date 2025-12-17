@@ -16,4 +16,7 @@ inline constexpr glm::vec2 gravity{0.0f, -30.0f};
 inline constexpr glm::vec2 acceleration{1.0f, -30.0f};
 inline constexpr int numCells{static_cast<int>(2.0f / (kParticleRadius * 2))};
 inline constexpr int maxParticlePerCell{4};
+// Colors
+inline constexpr glm::vec4 skyBlue{79.0f / 255.0f, 195.0f / 255.0f,
+                                   247.0f / 255.0f, 1.0f};
 } // namespace conf

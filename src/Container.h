@@ -2,6 +2,7 @@
 
 #include "Particle.h"
 #include "Shader.h"
+#include "configuration.h"
 #include <vector>
 
 class CircleContainer {
@@ -19,7 +20,7 @@ public:
   struct Data {
     float m_radius{600};
     glm::vec2 m_position{0, 0};
-    glm::vec4 m_color{79.0f / 255.0f, 195.0f / 255.0f, 247.0f / 255.0f, 1.0f};
+    glm::vec4 m_color{conf::skyBlue};
   } m_data{};
 
   CircleContainer(const std::vector<Particle> &particles,

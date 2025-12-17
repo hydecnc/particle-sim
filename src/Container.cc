@@ -1,7 +1,7 @@
-#include "Container.h"
 // clang-format off
 #include <glad/glad.h>
 // clang-format on
+#include "Container.h"
 #include "Shader.h"
 #include "configuration.h"
 #include <SDL3/SDL.h>

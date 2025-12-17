@@ -3,12 +3,12 @@
 #include <iostream>
 
 void Cell::addParticle(Particle &particle) {
-  if (m_particleCount < constants::maxParticlePerCell) {
+  if (m_particleCount < conf::maxParticlePerCell) {
     particles[m_particleCount] = &particle;
     ++m_particleCount;
   } else {
     std::cerr << "Fatal error: Too many particles in one cell (max: "
-              << constants::maxParticlePerCell << ")\n";
+              << conf::maxParticlePerCell << ")\n";
     std::exit(EXIT_FAILURE); // Exit with error code 1
   }
 }
@@ -16,8 +16,8 @@ void Cell::addParticle(Particle &particle) {
 void Cell::clear() { m_particleCount = 0; }
 
 Grid::Grid() {
-  for (int x{0}; x < constants::numCells; ++x) {
-    for (int y{0}; y < constants::numCells; ++y) {
+  for (int x{0}; x < conf::numCells; ++x) {
+    for (int y{0}; y < conf::numCells; ++y) {
       m_cells[x][y] = Cell();
     }
   }
@@ -33,8 +33,8 @@ void Grid::clearGrid() {
 
 void Grid::fillGrid(std::vector<Particle> &particles) {
   for (Particle &particle : particles) {
-    const glm::vec2 gridPos{(particle.curPosition() + 1.0f) / 2.0f *
-                            static_cast<float>(constants::numCells - 1)};
+    const glm::vec2 gridPos{(particle.m_curPosition + 1.0f) / 2.0f *
+                            static_cast<float>(conf::numCells - 1)};
     m_cells[static_cast<int>(gridPos.x)][static_cast<int>(gridPos.y)]
         .addParticle(particle);
   }
@@ -46,8 +46,8 @@ void Grid::updateGrid(std::vector<Particle> &particles) {
 }
 
 void Grid::solveCollisions() {
-  for (int x{1}; x < constants::numCells - 1; ++x) {
-    for (int y{1}; y < constants::numCells - 1; ++y) {
+  for (int x{1}; x < conf::numCells - 1; ++x) {
+    for (int y{1}; y < conf::numCells - 1; ++y) {
       Cell &currentCell{m_cells[x][y]};
       // iterate on all surrouding cells, including itself
       for (int dx{-1}; dx <= 1; ++dx) {

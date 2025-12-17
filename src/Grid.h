@@ -6,7 +6,7 @@
 
 class Cell {
 public:
-  static constexpr int maxParticles{constants::maxParticlePerCell};
+  static constexpr int maxParticles{conf::maxParticlePerCell};
   std::array<Particle *, maxParticles> particles{};
 
   void addParticle(Particle &particle);
@@ -27,6 +27,5 @@ public:
   void checkCellCollisions(Cell &c1, Cell &c2) const;
 
 private:
-  std::array<std::array<Cell, constants::numCells>, constants::numCells>
-      m_cells{};
+  std::array<std::array<Cell, conf::numCells>, conf::numCells> m_cells{};
 };
