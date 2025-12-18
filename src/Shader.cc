@@ -76,6 +76,6 @@ Shader::Shader(std::string_view vertexPath, std::string_view fragmentPath) {
 
 void Shader::use() const { glUseProgram(programId); }
 
-void Shader::setFloat(const std::string &name, float value) const {
-  glUniform1f(glGetUniformLocation(programId, name.c_str()), value);
+void Shader::setFloat(const char *name, float value) const {
+  glUniform1f(glGetUniformLocation(programId, name), value);
 }

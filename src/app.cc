@@ -25,8 +25,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   }
 
   // Setup window
-  SDL_Window *window = SDL_CreateWindow("Constellation", conf::kWidth,
-                                        conf::kHeight, SDL_WINDOW_OPENGL);
+  SDL_Window *window =
+      SDL_CreateWindow("Constellation", conf::kWidth, conf::kHeight,
+                       SDL_WINDOW_OPENGL | SDL_WINDOW_HIGH_PIXEL_DENSITY);
   if (!window) {
     SDL_Log("Couldn't create window: %s", SDL_GetError());
     return SDL_APP_FAILURE;
@@ -44,7 +45,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     SDL_Log("Couldn't create OpenGL context: %s", SDL_GetError());
     return SDL_APP_FAILURE;
   }
-
+  SDL_GL_SetSwapInterval(1); // Enable VSync
+  //
   // Load all OpenGL function pointers
   if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress)) {
     SDL_Log("Failed to initialize GLAD");
@@ -59,30 +61,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
           {0.3, 0.6},
       },
       Particle{
-          conf::kParticleRadius / 2,
+          conf::kParticleRadius,
           {1.0, 0.0, 0.0, 1.0},
           {-0.4, 0.6},
       },
-      // Particle{
-      //     conf::kParticleRadius,
-      //     {1.0, 0.0, 0.0, 1.0},
-      //     {-0.2, 0.6},
-      // },
-      // Particle{
-      //     conf::kParticleRadius,
-      //     {1.0, 0.0, 0.0, 1.0},
-      //     {-0.3, 0.6},
-      // },
-      // Particle{
-      //     conf::kParticleRadius,
-      //     {1.0, 0.0, 0.0, 1.0},
-      //     {0.1, 0.6},
-      // },
-      // Particle{
-      //     conf::kParticleRadius,
-      //     {1.0, 0.0, 0.0, 1.0},
-      //     {0.2, 0.6},
-      // },
   };
 
   // Initialize OpenGL and creaete shaders
@@ -93,6 +75,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
              (shader_path + "circle_container.frag").c_str());
   Shader particle_shader = Shader((shader_path + "particle.vert").c_str(),
                                   (shader_path + "particle.frag").c_str());
+  float scale{SDL_GetWindowPixelDensity(window)};
+  container_shader.use();
+  container_shader.setFloat("scale", scale);
+  particle_shader.use();
+  particle_shader.setFloat("scale", scale);
+
   CircleContainer container =
       CircleContainer{particles, container_shader, particle_shader};
   container.setupContainerBuffers();
