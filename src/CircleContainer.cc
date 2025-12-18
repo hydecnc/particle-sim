@@ -7,13 +7,15 @@
 #include "configuration.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengles2.h>
-#include <iostream>
 
-CircleContainer::CircleContainer(const std::vector<Particle> &particles,
+CircleContainer::CircleContainer(std::vector<Particle> &particles,
                                  const Shader &containerShader,
                                  const Shader &particleShader)
     : m_particles{particles}, m_containerShader{containerShader},
       m_particleShader{particleShader} {
+  for (auto &particle : m_particles) {
+    m_grid.add(&particle);
+  }
   setupContainerBuffers();
   setupParticleBuffers();
 }
@@ -88,6 +90,11 @@ void CircleContainer::drawContainer() {
   glDrawArrays(GL_POINTS, 0, 1);
 }
 
+void CircleContainer::addParticle(Particle &particle) {
+  m_particles.push_back(particle);
+  m_grid.add(&particle);
+}
+
 void CircleContainer::updateParticles(const float deltatime) {
   // Make simulation slow down no more than 60 fps
   constexpr float MAX_DT{1.0f / 60.0f};
@@ -97,20 +104,17 @@ void CircleContainer::updateParticles(const float deltatime) {
   const float sub_deltatime{clamped_dt / static_cast<float>(substeps)};
 
   for (std::size_t i{0}; i < substeps; ++i) {
-    int part{0};
     for (auto &particle : m_particles) {
-      std::cout << "Particle #: " << part << '\n';
       particle.updatePosition(sub_deltatime);
-      part++;
     }
     for (int iter{0}; iter < 3; ++iter) {
       m_grid.handleCollision();
+      m_grid.updateGrid(m_particles);
     }
     for (auto &particle : m_particles) {
       applyConstraint(particle);
     }
   }
-  // std::cout << "FINISHED\n";
 }
 
 void CircleContainer::drawParticles() {
@@ -136,30 +140,6 @@ void CircleContainer::applyConstraint(Particle &particle) {
                      n * (container_radius - particle_radius)};
     newPos.x /= conf::aspectRatio;
     particle.m_curPosition = newPos;
-  }
-}
-
-void CircleContainer::processCollisions() {
-  for (std::size_t i{0}; i < m_particles.size(); ++i) {
-    Particle &p1{m_particles[i]};
-    for (std::size_t j{i + 1}; j < m_particles.size(); ++j) {
-      Particle &p2{m_particles[j]};
-      if (&p1 == &p2)
-        continue;
-      const float p1_radius{p1.m_radius / conf::kHeight};
-      const float p2_radius{p2.m_radius / conf::kHeight};
-
-      glm::vec2 collision_axis{p1.m_curPosition - p2.m_curPosition};
-      collision_axis.x *= conf::aspectRatio;
-      const float dist{glm::length(collision_axis)};
-
-      if (dist < p1_radius + p2_radius) {
-        glm::vec2 n{collision_axis / dist};
-        const float delta{(p1_radius + p2_radius) - dist};
-        p1.m_curPosition += 0.5f * delta * n;
-        p2.m_curPosition -= 0.5f * delta * n;
-      }
-    }
   }
 }
 

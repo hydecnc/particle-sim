@@ -8,12 +8,14 @@ public:
   void add(Particle *particle);
   void handleCollision();
   void handleParticle(Particle *particle, Particle *other);
+  void handleParticles(Particle *particle,
+                       const std::vector<Particle *> &others);
   void handleCell(const int x, const int y);
-  void move(Particle *particle, const glm::vec2 &position);
+  void updateGrid(std::vector<Particle> &particles);
 
 private:
   void clearGrid();
 
 private:
-  Particle *m_cells[conf::kNumCells][conf::kNumCells];
+  std::vector<Particle *> m_cells[conf::kNumCells][conf::kNumCells];
 };

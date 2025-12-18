@@ -53,16 +53,16 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   SDL_GL_MakeCurrent(window, gl_context);
 
   std::vector<Particle> particles = {
-      // Particle{
-      //     conf::kParticleRadius,
-      //     {1.0, 0.0, 0.0, 1.0},
-      //     {0.3, 0.6},
-      // },
-      // Particle{
-      //     conf::kParticleRadius / 2,
-      //     {1.0, 0.0, 0.0, 1.0},
-      //     {-0.4, 0.6},
-      // },
+      Particle{
+          conf::kParticleRadius,
+          {1.0, 0.0, 0.0, 1.0},
+          {0.3, 0.6},
+      },
+      Particle{
+          conf::kParticleRadius / 2,
+          {1.0, 0.0, 0.0, 1.0},
+          {-0.4, 0.6},
+      },
       // Particle{
       //     conf::kParticleRadius,
       //     {1.0, 0.0, 0.0, 1.0},
@@ -124,9 +124,9 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
   // print fps
   float fps{1.0f / deltatime};
-  // std::cout << "\rFPS: " << static_cast<int>(fps) << "    "
-  //           << "Num particles: " << state.container.m_particles.size()
-  //           << "     " << std::flush;
+  std::cout << "\rFPS: " << static_cast<int>(fps) << "    "
+            << "Num particles: " << state.container.m_particles.size()
+            << "     " << std::flush;
 
   // Clear previous frame
   glClearColor(conf::kBackgroundColor.r, conf::kBackgroundColor.g,
@@ -135,12 +135,12 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
   particle_add_counter++;
   if (particle_add_counter >= conf::kParticleSpawnRate) {
-    state.container.m_particles.push_back(Particle{
-        &state.container.m_grid,
+    Particle particle = {
         conf::kParticleRadius,
         {1.0, 0.0, 0.0, 1.0},
         {0.2, 0.6},
-    });
+    };
+    state.container.addParticle(particle);
     particle_add_counter = 0;
   }
   state.container.drawContainer();

@@ -25,12 +25,13 @@ public:
     glm::vec4 m_color{conf::skyBlue};
   } m_data{};
 
-  CircleContainer(const std::vector<Particle> &particles,
+  CircleContainer(std::vector<Particle> &particles,
                   const Shader &containerShader, const Shader &particleShader);
 
   void setupParticleBuffers();
   void setupContainerBuffers();
 
+  void addParticle(Particle &particle);
   void updateParticles(const float deltatime);
   void drawContainer();
   void drawParticles();
