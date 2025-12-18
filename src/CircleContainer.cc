@@ -100,10 +100,9 @@ void CircleContainer::updateParticles(const float deltatime) {
   constexpr float MAX_DT{1.0f / 60.0f};
   const float clamped_dt{std::min(deltatime, MAX_DT)};
 
-  constexpr int substeps{1};
-  const float sub_deltatime{clamped_dt / static_cast<float>(substeps)};
+  const float sub_deltatime{clamped_dt / static_cast<float>(conf::kSubsteps)};
 
-  for (std::size_t i{0}; i < substeps; ++i) {
+  for (std::size_t i{0}; i < conf::kSubsteps; ++i) {
     for (auto &particle : m_particles) {
       particle.updatePosition(sub_deltatime);
     }
@@ -131,14 +130,14 @@ void CircleContainer::applyConstraint(Particle &particle) {
   const float container_radius{m_data.m_radius / conf::kHeight};
 
   glm::vec2 disp{particle.m_curPosition - m_data.m_position};
-  disp.x *= conf::aspectRatio;
+  disp.x *= conf::kAspectRatio;
   const float dist{glm::length(disp)};
 
   if (dist > (container_radius - particle_radius)) {
     const glm::vec2 n{disp / dist};
     glm::vec2 newPos{m_data.m_position +
                      n * (container_radius - particle_radius)};
-    newPos.x /= conf::aspectRatio;
+    newPos.x /= conf::kAspectRatio;
     particle.m_curPosition = newPos;
   }
 }

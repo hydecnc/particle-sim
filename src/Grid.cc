@@ -2,7 +2,6 @@
 #include "Particle.h"
 #include "configuration.h"
 #include "glm/fwd.hpp"
-#include <iostream>
 
 Grid::Grid() { clearGrid(); }
 
@@ -61,7 +60,7 @@ void Grid::handleParticle(Particle *particle, Particle *other) {
   const float particle_radius{particle->m_radius / conf::kHeight};
   const float other_radius{other->m_radius / conf::kHeight};
   glm::vec2 collision_axis{particle->m_curPosition - other->m_curPosition};
-  collision_axis.x *= conf::aspectRatio;
+  collision_axis.x *= conf::kAspectRatio;
   const float dist{glm::length(collision_axis)};
   if (dist < particle_radius + other_radius) {
     glm::vec2 n{collision_axis / dist};
