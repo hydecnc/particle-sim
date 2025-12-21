@@ -10,6 +10,8 @@ inline constexpr int kSubsteps{4};
 inline constexpr float kAspectRatio{static_cast<float>(kWidth) /
                                     static_cast<float>(kHeight)};
 inline constexpr float kParticleRadius{10.0f};
+inline constexpr glm::vec4 kParticleColor{234.0f / 255.0f, 224.0f / 255.0f,
+                                          200.0f / 255.0f, 1.0f};
 inline constexpr int kParticleSpawnRate{20};
 inline constexpr int kMaxParticles{3000};
 // Radius of container, from 0 to 1

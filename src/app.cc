@@ -57,12 +57,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
   std::vector<Particle> particles = {
       Particle{
           conf::kParticleRadius,
-          {1.0, 0.0, 0.0, 1.0},
+          conf::kParticleColor,
           {0.3, 0.6},
       },
       Particle{
           conf::kParticleRadius,
-          {1.0, 0.0, 0.0, 1.0},
+          conf::kParticleColor,
           {-0.4, 0.6},
       },
   };
@@ -124,7 +124,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   particle_add_counter++;
   if (particle_add_counter >= conf::kParticleSpawnRate) {
     Particle particle = {
-        conf::kParticleRadius, {1.0, 1.0, 0.0, 1.0}, {0.2, 0.6}};
+        conf::kParticleRadius, conf::kParticleColor, {0.2, 0.6}};
     particle.boost(conf::kInitalAcceleration);
     state.container.addParticle(particle);
     particle_add_counter = 0;
