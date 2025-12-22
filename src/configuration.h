@@ -6,10 +6,10 @@ namespace conf {
 inline constexpr unsigned int kWidth{800};
 inline constexpr unsigned int kHeight{600};
 inline constexpr glm::vec4 kBackgroundColor{0.1f, 0.1f, 0.1f, 1.0f};
-inline constexpr int kSubsteps{4};
+inline constexpr int kSubsteps{8};
 inline constexpr float kAspectRatio{static_cast<float>(kWidth) /
                                     static_cast<float>(kHeight)};
-inline constexpr float kParticleRadius{10.0f};
+inline constexpr float kParticleRadius{20.0f};
 inline constexpr glm::vec4 kParticleColor{234.0f / 255.0f, 224.0f / 255.0f,
                                           200.0f / 255.0f, 1.0f};
 inline constexpr int kParticleSpawnRate{20};

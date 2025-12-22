@@ -24,11 +24,12 @@ float box(in vec2 _st, in vec2 _size){
 void main() {
     // Convert point coord to center origin (-1 to +1)
     vec2 coord = gl_PointCoord * 2.0 - 1.0;
-    vec2 st = tile(gl_PointCoord, 3.0);
-    
+    vec2 st = tile(gl_PointCoord, 1.0);
+
     float r = dot(coord, coord);
 
-    float result = box(st, vec2(0.75, 0.75));
+    float result = box(st, vec2(0.75, 0.25));
+    result += box(st, vec2(0.25, 0.75));
 
     float alpha = smoothstep(1.0, 0.98, r);
 
